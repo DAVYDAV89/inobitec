@@ -33,11 +33,12 @@ void Generator::incomingConnection(qintptr _handle)
             if (m_timerSend -> isActive())
                 m_timerSend -> stop();
         }
-
-
-
-
 //        m_amplitude = text.toInt();
+    });
+
+    connect(m_socket, &QTcpSocket::disconnected, [&]() {
+        if (m_timerSend -> isActive())
+            m_timerSend -> stop();
     });
 
     if (m_socket->setSocketDescriptor(_handle)) {
