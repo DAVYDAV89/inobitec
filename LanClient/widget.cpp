@@ -11,6 +11,9 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
     mSocket = new QTcpSocket(this);
 
+    quint16 _port = 4444;
+    mSocket->connectToHost("localhost", _port);
+
     ui -> color -> addItem(QString::fromLocal8Bit("Синий"));
     ui -> color -> addItem(QString::fromLocal8Bit("Красный"));
     ui -> color -> addItem(QString::fromLocal8Bit("Зеленый"));
@@ -24,7 +27,6 @@ Widget::Widget(QWidget *parent)
 
     connect(mSocket, &QTcpSocket::connected, [&]() {
         qDebug() << "Client encrypted";
-        mSocket -> write(QString::number(20).toLatin1());
     });
 
     connect(mSocket, &QTcpSocket::readyRead, [&]() {
@@ -35,6 +37,16 @@ Widget::Widget(QWidget *parent)
         y.push_back(text.toInt());
 
         _x = _x + (ui -> spinBox -> text().toDouble());
+
+        if ( _x > ui -> customPlot -> xAxis -> range().upper ) {
+            ui -> customPlot -> xAxis -> setRange(0, _x);
+            ui -> xUpDown -> setValue(_x);
+        }
+
+        if ( text.toInt() > ui -> customPlot -> yAxis -> range().upper ) {
+            ui -> customPlot -> yAxis -> setRange(0, text.toInt());
+            ui -> yUpDown -> setValue(text.toInt());
+        }
 
         ui -> customPlot -> graph(0) -> addData(x,y);
         ui -> customPlot -> replot();
@@ -49,25 +61,15 @@ Widget::~Widget()
 
 void Widget::on_bind_clicked()
 {
-//    QString _str;
-//    QFile _setPort("../LanClient/setPort.conf");
-//    if ( (_setPort.exists()) && (_setPort.open(QIODevice::ReadOnly) ) ){
+    if (ui -> bind -> text() == QString::fromLocal8Bit("Запустить")) {
+        mSocket -> write("0x01");
+        ui -> bind -> setText(QString::fromLocal8Bit("Остановить"));
+    }
+    else {
+        mSocket -> write("0x00");
+        ui -> bind -> setText(QString::fromLocal8Bit("Запустить"));
+    }
 
-//        while(!_setPort.atEnd())
-//        {
-//            _str += _setPort.readLine();
-//        }
-//        _setPort.close();
-//    }
-
-//    quint16 _port;
-//    QStringList _arguments = _str.split("port:", QString::SkipEmptyParts);
-//    for (const auto &el : _arguments) {
-//        _port = el.toUInt();
-//    }
-
-    quint16 _port = 4444;
-    mSocket->connectToHost("localhost", _port);
 }
 
 void Widget::on_color_activated(int _index)
