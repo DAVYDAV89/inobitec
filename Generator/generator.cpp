@@ -27,11 +27,20 @@ void Generator::incomingConnection(qintptr _handle)
         QTextStream T(m_socket);
         auto text = T.readAll();
 
-        m_amplitude = text.toInt();
+        if (text == "0x01")
+            m_timerSend -> start(200);
+        else if (text == "0x00") {
+            if (m_timerSend -> isActive())
+                m_timerSend -> stop();
+        }
+
+
+
+
+//        m_amplitude = text.toInt();
     });
 
     if (m_socket->setSocketDescriptor(_handle)) {
         qDebug() << "Client connected with handle: " << _handle;
-        m_timerSend -> start(200);
     }
 }
