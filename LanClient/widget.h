@@ -21,12 +21,12 @@ private slots:
     void on_bind_clicked();
 
     void on_color_activated(int _index);
-    void on_amplitude_valueChanged(int _arg1);
 
     void on_xUpDown_valueChanged(int _arg1);
-    void on_yUpDown_valueChanged(int _arg1);
 
     void on_width_valueChanged(int _arg1);
+
+    void slotRangeChanged(QCPRange);
 
 private:
     Ui::Widget *ui;
